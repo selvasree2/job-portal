@@ -1,3 +1,4 @@
+```js
 const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
 const path = require('path');
@@ -12,7 +13,6 @@ CREATE TABLE IF NOT EXISTS users(
   password TEXT,
   role TEXT
 );
-
 CREATE TABLE IF NOT EXISTS jobs(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT,
@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS jobs(
   employer_id INTEGER,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE IF NOT EXISTS applications(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   job_id INTEGER,
@@ -34,40 +33,38 @@ CREATE TABLE IF NOT EXISTS applications(
 );
 `);
 
-const demoEmail = 'employer@demo.com';
-const demoPassword = bcrypt.hashSync('123456', 8);
+const email = 'employer@demo.com';
+const password = bcrypt.hashSync('123456', 8);
 
 const existing = db.prepare(
   'SELECT id FROM users WHERE email = ?'
-).get(demoEmail);
+).get(email);
 
-if (!existing) {
+let employerId;
+
+if (existing) {
+  employerId = existing.id;
+  db.prepare(
+    'UPDATE users SET name=?, password=?, role=? WHERE id=?'
+  ).run('Demo Company', password, 'employer', employerId);
+} else {
   const result = db.prepare(
     'INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)'
-  ).run('Demo Company', demoEmail, demoPassword, 'employer');
+  ).run('Demo Company', email, password, 'employer');
+  employerId = result.lastInsertRowid;
+}
 
+if (!db.prepare('SELECT id FROM jobs LIMIT 1').get()) {
   const addJob = db.prepare(
     'INSERT INTO jobs(title,company,location,salary,description,employer_id) VALUES(?,?,?,?,?,?)'
   );
-
-  addJob.run(
-    'Junior Web Developer', 'Demo Company', 'Madurai',
-    '₹15,000 - 25,000',
-    'HTML, CSS, JavaScript theriyanum. Freshers welcome.',
-    result.lastInsertRowid
-  );
-
-  addJob.run(
-    'Node.js Backend Developer', 'Demo Company', 'Chennai',
-    '₹30,000 - 45,000', 'Node, Express, SQL experience venum.',
-    result.lastInsertRowid
-  );
-
-  addJob.run(
-    'Data Entry Operator', 'Demo Company', 'Coimbatore',
-    '₹12,000 - 16,000', 'Typing speed nalla irukkanum.',
-    result.lastInsertRowid
-  );
+  addJob.run('Junior Web Developer', 'Demo Company', 'Madurai',
+    '₹15,000 - 25,000', 'Freshers welcome.', employerId);
+  addJob.run('Node.js Backend Developer', 'Demo Company', 'Chennai',
+    '₹30,000 - 45,000', 'Node, Express, SQL experience venum.', employerId);
+  addJob.run('Data Entry Operator', 'Demo Company', 'Coimbatore',
+    '₹12,000 - 16,000', 'Typing speed nalla irukkanum.', employerId);
 }
 
 module.exports = db;
+```
