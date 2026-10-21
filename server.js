@@ -9,8 +9,7 @@ const SECRET = 'job_portal_secret_change_me';
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(express.static(__dirname));
 // ---- auth middleware ----
 const auth = (role) => (req, res, next) => {
   const token = (req.headers.authorization || '').replace('Bearer ', '');
