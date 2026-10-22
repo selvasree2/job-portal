@@ -1,4 +1,3 @@
-```js
 const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
 const path = require('path');
@@ -67,4 +66,3 @@ if (!db.prepare('SELECT id FROM jobs LIMIT 1').get()) {
 }
 
 module.exports = db;
-```
