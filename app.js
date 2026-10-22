@@ -72,9 +72,19 @@ function viewLogin() {
 }
 async function login() {
   try {
-    const d = await api('/login', 'POST', { email: email.value, password: pw.value });
+    const emailInput = document.getElementById('email').value.trim().toLowerCase();
+    const passwordInput = document.getElementById('pw').value;
+
+    const d = await api('/login', 'POST', {
+      email: emailInput,
+      password: passwordInput
+    });
+
     saveAuth(d);
-  } catch (e) { toast(e.message); }
+  } catch (e) {
+    console.error('Login error:', e);
+    toast(e.message);
+  }
 }
 function viewRegister() {
   app.innerHTML = `<div class="card form"><h2>Register</h2>
