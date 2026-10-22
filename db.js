@@ -64,5 +64,9 @@ if (!db.prepare('SELECT id FROM jobs LIMIT 1').get()) {
   addJob.run('Data Entry Operator', 'Demo Company', 'Coimbatore',
     '₹12,000 - 16,000', 'Typing speed nalla irukkanum.', employerId);
 }
-
+console.log(
+  'Demo account:',
+  db.prepare('SELECT email, role FROM users WHERE email = ?')
+    .get('employer@demo.com')
+);
 module.exports = db;
